@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-schema" author="digicart">
+        <sql>CREATE SCHEMA IF NOT EXISTS subscription_svc</sql>
+    </changeSet>
+
+    <changeSet id="002-create-subscription-plans" author="digicart">
+        <createTable tableName="subscription_plans" schemaName="subscription_svc">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_products" type="INTEGER" defaultValueNumeric="50"/>
+            <column name="price" type="DOUBLE PRECISION" defaultValueNumeric="0.0"/>
+            <column name="currency" type="VARCHAR(10)" defaultValue="INR"/>
+            <column name="billing_period" type="VARCHAR(50)" defaultValue="MONTHLY"/>
+            <column name="custom_days" type="INTEGER"/>
+            <column name="features" type="JSONB" defaultValue="{}"/>
+            <column name="details" type="TEXT"/>
+            <column name="level" type="VARCHAR(255)"/>
+            <column name="max_uses" type="INTEGER"/>
+            <column name="total_uses" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="003-create-merchant-subscriptions" author="digicart">
+        <createTable tableName="merchant_subscriptions" schemaName="subscription_svc">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="merchant_email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="plan_id" type="VARCHAR(36)"/>
+            <column name="renews_at" type="TIMESTAMPTZ"/>
+            <column name="available_days" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="subscribed_at" type="TIMESTAMPTZ"/>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="merchant_subscriptions" schemaName="subscription_svc"
+                     indexName="idx_merchant_subscriptions_email">
+            <column name="merchant_email"/>
+        </createIndex>
+        <createIndex tableName="merchant_subscriptions" schemaName="subscription_svc"
+                     indexName="idx_merchant_subscriptions_plan_id">
+            <column name="plan_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
