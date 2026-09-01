@@ -57,4 +57,5 @@ jobs:
           gcloud run services update ${{ env.SERVICE }} \
             --region ${{ env.REGION }} \
             --image ${{ env.IMAGE }}:latest \
+            --allow-unauthenticated \
             --quiet
